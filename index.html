@@ -1,1 +1,236 @@
-tesing connection to all parts of my project
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="theme-color" content="#e7f0c7">
+		<title>A Very Important Questionnaire</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="pretty.css">
+	</head>
+	<body>
+		<div class="paper-grain" aria-hidden="true"></div>
+		<div class="page-wrap">
+			<header class="topbar">
+				<a class="wordmark" href="#" aria-label="A Very Important Questionnaire home">
+					<span class="wordmark-stamp" aria-hidden="true">♥</span>
+					<span>THE LOVE DEPARTMENT</span>
+				</a>
+				<span class="issue-label">FIELD STUDY NO. 008</span>
+			</header>
+
+			<main id="app" class="app" aria-live="polite" aria-atomic="true"></main>
+
+			<footer class="page-footer">
+				<span>COMPLETELY UNOFFICIAL. EXTREMELY IMPORTANT.</span>
+				<span aria-hidden="true">✳</span>
+			</footer>
+		</div>
+
+		<script>
+			const SHEETS_CONFIG = {
+				webAppUrl: "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL"
+			};
+
+			const questions = [
+				{
+					kind: "choice",
+					prompt: "We have one free evening and absolutely no responsibilities. What’s the move?",
+					options: ["Pajamas, snacks, and a movie", "A dinner that requires real shoes", "Go somewhere new and figure it out", "You pick, as long as there are fries"]
+				},
+				{
+					kind: "text",
+					prompt: "If our life together were a sitcom, what would the title be?",
+					placeholder: "Please make it something the network regrets..."
+				},
+				{
+					kind: "choice",
+					prompt: "Choose our official couple snack. This decision may be legally binding.",
+					options: ["Popcorn, by the bucket", "A suspicious amount of cheese", "Dessert before dinner", "One bite of yours, ten times"]
+				},
+				{
+					kind: "choice",
+					prompt: "A tiny adventure appears on the calendar. Which one are you claiming?",
+					options: ["A scenic drive with an elite playlist", "A little town we’ve never visited", "A walk that ends at a bakery", "A blanket fort with room service energy"]
+				},
+				{
+					kind: "text",
+					prompt: "What song should play when we make an unnecessarily dramatic entrance?",
+					placeholder: "Name the song. Choreography is optional."
+				},
+				{
+					kind: "text",
+					prompt: "What’s one tiny thing I do that you secretly (or not secretly) love?",
+					placeholder: "Evidence is encouraged..."
+				},
+				{
+					kind: "choice",
+					prompt: "If we unlocked a relationship superpower, what should it be?",
+					options: ["Always knowing what the other wants to eat", "Teleporting directly to vacation", "Making any bad day at least 30% funnier", "Finding the remote on the first try"]
+				},
+				{
+					kind: "text",
+					prompt: "Last one: what should we make time for together soon?",
+					placeholder: "Big plan, tiny plan, or highly specific snack mission..."
+				}
+			];
+
+			const app = document.querySelector("#app");
+			const answers = Array(questions.length).fill("");
+			let currentQuestion = 0;
+
+			function renderIntro() {
+				app.innerHTML = `
+					<section class="intro-panel">
+						<div class="eyebrow"><span class="eyebrow-rule"></span> A QUESTIONNAIRE FOR MY FAVORITE PERSON</div>
+						<div class="intro-layout">
+							<div class="intro-copy">
+								<h1>A very important<br><span>girlfriend survey.</span></h1>
+								<p class="intro-description">Eight questions. No wrong answers. Some answers may result in snacks, dates, or me being unbearably pleased.</p>
+								<button class="button button-primary" id="start-button" type="button">Begin the inquiry <span aria-hidden="true">↗</span></button>
+								<p class="time-note"><span aria-hidden="true">◷</span> About 2 minutes · For research purposes (love)</p>
+							</div>
+							<div class="cover-art" aria-label="A little love note, sealed with a heart">
+								<span class="cover-spark spark-one" aria-hidden="true">✳</span>
+								<span class="cover-spark spark-two" aria-hidden="true">✳</span>
+								<div class="note-card">
+									<span class="note-topline">TOP SECRET</span>
+									<span class="note-heart" aria-hidden="true">♥</span>
+									<span class="note-caption">for my<br>favorite human</span>
+									<span class="note-seal" aria-hidden="true">xoxo</span>
+								</div>
+								<span class="cover-caption">CONFIDENTIAL<br>(not really)</span>
+							</div>
+						</div>
+						<div class="intro-bottom"><span>NO. 01 — 08</span><span>THE MOST SCIENTIFIC STUDY OF US</span></div>
+					</section>`;
+				document.querySelector("#start-button").addEventListener("click", () => {
+					currentQuestion = 0;
+					renderQuestion();
+				});
+			}
+
+			function renderQuestion() {
+				const question = questions[currentQuestion];
+				const answer = answers[currentQuestion];
+				const progress = ((currentQuestion + 1) / questions.length) * 100;
+				const answerMarkup = question.kind === "choice"
+					? `<div class="option-list" role="group" aria-label="Answer options">${question.options.map((option, index) => `
+							<button class="option${answer === option ? " is-selected" : ""}" type="button" data-option="${index}" aria-pressed="${answer === option}">
+								<span class="option-letter">${String.fromCharCode(65 + index)}</span><span>${option}</span><span class="option-check" aria-hidden="true">✓</span>
+							</button>`).join("")}</div>`
+					  : `<label class="visually-hidden" for="free-answer">Your answer</label><textarea id="free-answer" class="answer-input" rows="3" maxlength="500" placeholder="${question.placeholder}"></textarea>`;
+
+				app.innerHTML = `
+					<section class="question-panel">
+						<div class="progress-row"><span>THE QUESTIONNAIRE</span><span>${String(currentQuestion + 1).padStart(2, "0")} <i>/</i> ${String(questions.length).padStart(2, "0")}</span></div>
+						<div class="progress-track" role="progressbar" aria-label="Questionnaire progress" aria-valuemin="1" aria-valuemax="${questions.length}" aria-valuenow="${currentQuestion + 1}"><span style="width: ${progress}%"></span></div>
+						<div class="question-content">
+							<p class="question-kicker">QUESTION ${String(currentQuestion + 1).padStart(2, "0")}</p>
+							<h1>${question.prompt}</h1>
+							${answerMarkup}
+						</div>
+						<div class="question-controls">
+							<button class="button button-quiet" id="back-button" type="button"><span aria-hidden="true">←</span> Back</button>
+							<button class="button button-primary" id="next-button" type="button" ${question.kind === "choice" && !answer ? "disabled" : ""}>${currentQuestion === questions.length - 1 ? "Review answers" : "Next question"} <span aria-hidden="true">→</span></button>
+						</div>
+					</section>`;
+
+				app.querySelectorAll("[data-option]").forEach((button) => {
+					button.addEventListener("click", () => {
+						answers[currentQuestion] = question.options[Number(button.dataset.option)];
+						renderQuestion();
+						app.querySelector(`[data-option="${button.dataset.option}"]`).focus();
+					});
+				});
+
+				const textInput = document.querySelector("#free-answer");
+				if (textInput) {
+					textInput.value = answer;
+					textInput.addEventListener("input", (event) => {
+						answers[currentQuestion] = event.target.value.trim();
+					});
+				}
+
+				document.querySelector("#back-button").addEventListener("click", () => {
+					if (currentQuestion === 0) renderIntro();
+					else {
+						currentQuestion -= 1;
+						renderQuestion();
+					}
+				});
+				document.querySelector("#next-button").addEventListener("click", () => {
+					if (currentQuestion < questions.length - 1) {
+						currentQuestion += 1;
+						renderQuestion();
+					} else renderReview();
+				});
+			}
+
+			function renderReview() {
+				const rows = questions.map((question, index) => {
+					const item = document.createElement("div");
+					item.className = "review-item";
+					const label = document.createElement("p");
+					label.className = "review-question";
+					label.textContent = `${String(index + 1).padStart(2, "0")} / ${question.prompt}`;
+					const answer = document.createElement("p");
+					answer.className = "review-answer";
+					answer.textContent = answers[index] || "(left delightfully mysterious)";
+					item.append(label, answer);
+					return item;
+				});
+
+				app.innerHTML = `
+					<section class="review-panel">
+						<div class="eyebrow"><span class="eyebrow-rule"></span> FINAL REVIEW</div>
+						<h1>Look what you<br><span>have to say.</span></h1>
+						<div class="review-list"></div>
+						<div class="question-controls">
+							<button class="button button-quiet" id="edit-button" type="button"><span aria-hidden="true">←</span> Edit answers</button>
+							<button class="button button-primary" id="send-button" type="button">Save answers to the sheet <span aria-hidden="true">↗</span></button>
+						</div>
+						<p id="send-status" class="send-status" role="status"></p>
+					</section>`;
+				const list = app.querySelector(".review-list");
+				rows.forEach((row) => list.append(row));
+				document.querySelector("#edit-button").addEventListener("click", () => {
+					currentQuestion = questions.length - 1;
+					renderQuestion();
+				});
+				document.querySelector("#send-button").addEventListener("click", sendAnswers);
+			}
+
+			async function sendAnswers() {
+				const button = document.querySelector("#send-button");
+				const status = document.querySelector("#send-status");
+				button.disabled = true;
+				status.textContent = "Sending your very important findings to the sheet...";
+
+				if (!SHEETS_CONFIG.webAppUrl.startsWith("https://script.google.com/macros/s/")) {
+					status.textContent = "The response sheet isn’t connected yet. Follow the Google Sheets setup in README.md.";
+					button.disabled = false;
+					return;
+				}
+
+				try {
+					await fetch(SHEETS_CONFIG.webAppUrl, {
+						method: "POST",
+						mode: "no-cors",
+						headers: { "Content-Type": "text/plain;charset=utf-8" },
+						body: JSON.stringify({ answers })
+					});
+					status.textContent = "Submitted! Check the Responses tab in your Google Sheet.";
+					button.textContent = "Submitted ✓";
+				} catch (error) {
+					status.textContent = "Couldn’t submit the answers. Check the deployed Apps Script URL and try again.";
+					button.disabled = false;
+				}
+			}
+
+			renderIntro();
+		</script>
+	</body>
+</html>
